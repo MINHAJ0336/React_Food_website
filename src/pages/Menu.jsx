@@ -3,9 +3,11 @@ import { motion } from 'framer-motion'
 import { supabase } from '../config/supabase'
 import { FaSearch, FaShoppingCart, FaStar, FaEye } from 'react-icons/fa'
 import { useNavigate, Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'  // ✅ Add this import
 import toast from 'react-hot-toast'
 
 const Menu = () => {
+  const { user } = useAuth()  // ✅ Get user from auth context
   const [menuItems, setMenuItems] = useState([])
   const [restaurants, setRestaurants] = useState({})
   const [searchTerm, setSearchTerm] = useState('')
@@ -59,6 +61,14 @@ const Menu = () => {
   const addToCart = (item, e) => {
     e.stopPropagation()
     e.preventDefault()
+    
+    // ✅ Check if user is logged in
+    if (!user) {
+      toast.error('Please login to add items to cart')
+      navigate('/login')
+      return
+    }
+    
     const cart = JSON.parse(localStorage.getItem('cart') || '[]')
     const existing = cart.find(i => i.id === item.id)
     
